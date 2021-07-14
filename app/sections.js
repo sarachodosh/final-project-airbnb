@@ -1085,45 +1085,45 @@ function draw8(){
      console.log("draw8");
 }
 
-function drawMapBox(){
-     clean('isMapBox')
-     console.log("draw9");
-}
+// function drawMapBox(){
+//      clean('isMapBox')
+//      console.log("draw9");
+// }
 
-function ex1(){
-    console.log("ex1");
-    clean('isEx1')
-}
-function ex2(){
-    console.log("ex2");
-}
-function ex3(){
-    console.log("ex3");
-}
-function ex4(){
-    console.log("ex4");
-}
-function ex5(){
-    console.log("ex5");
-}
-function ex6(){
-    console.log("ex6");
-}
-function ex7(){
-    console.log("ex7");
-}
-function ex8(){
-    console.log("ex8");
-}
-function ex9(){
-    console.log("ex9");
-}
+// function ex1(){
+//     console.log("ex1");
+//     clean('isEx1')
+// }
+// function ex2(){
+//     console.log("ex2");
+// }
+// function ex3(){
+//     console.log("ex3");
+// }
+// function ex4(){
+//     console.log("ex4");
+// }
+// function ex5(){
+//     console.log("ex5");
+// }
+// function ex6(){
+//     console.log("ex6");
+// }
+// function ex7(){
+//     console.log("ex7");
+// }
+// function ex8(){
+//     console.log("ex8");
+// }
+// function ex9(){
+//     console.log("ex9");
+// }
 function drawConclusions(){
     console.log("drawConclusions");
 }
-function drawMeto(){
-    console.log("drawMeto");
-}
+// function drawMeto(){
+//     console.log("drawMeto");
+// }
 function drawFooter(){
     console.log("drawFooter");
 }
@@ -1150,19 +1150,19 @@ let activationFunctions = [
     draw5,
     draw6,
     draw7,
-    draw8,
-    drawMapBox,
-    ex1,
-    ex2,
-    ex3,
-    ex4,
-    ex5,
-    ex6,
-    ex7,
-    ex8,
-    ex9,
+    // draw8,
+    // drawMapBox,
+    // ex1,
+    // ex2,
+    // ex3,
+    // ex4,
+    // ex5,
+    // ex6,
+    // ex7,
+    // ex8,
+    // ex9,
     drawConclusions,
-    drawMeto,
+    // drawMeto,
     drawFooter
 ]
 
