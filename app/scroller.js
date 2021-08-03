@@ -1,5 +1,3 @@
-
-
 function scroller(){
     let container = d3.select('body')
     let dispatch = d3.dispatch('active', 'progress');
@@ -53,7 +51,7 @@ function scroller(){
     }
 
     scroll.container = function(value) {
-        if (arguments.legth === 0){
+        if (arguments.length === 0){
             return container
         } 
         container = value 

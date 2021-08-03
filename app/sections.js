@@ -1,24 +1,13 @@
-let svg, points, grid, finalData, finalData_noBCN
+let svg, grid, finalData, finalData_noBCN
 let popAxis, popAxis_noBCN, airbnbAxis, airbnbAxis_noBCN, airbnbPerAxis
-let airbnbScale, airbnbPerScale, popScale, popScale_noBCN, airbnbScale_r
+let airbnbScale, airbnbPerScale, popScale, popScale_noBCN
 let blue, yellow, teal, orange, newblue, pink
 let simulation, nodes
-let airbnbPerLegend, sizeLegend
-let fillScale, square
 let bar_start_points, start_x
 
 const margin = {left: 100, top: 100, bottom: 100, right: 100}
 const width = 1000
 const height = 1000
-// const graphWidth = width - margin.left - margin.right
-// const graphHeight = height - margin.top - margin.bottom
-
-
-
-
-const paddingMap = 100;
-
-const colors = ['#ffcc00', '#ff6666', '#cc0066', '#66cccc', '#f688bb', '#65587f', '#baf1a1', '#333333', '#75b79e',  '#66cccc', '#9de3d0', '#f1935c', '#0c7b93', '#eab0d9', '#baf1a1', '#9399ff']
 
 const brandCodes = {
     'Pirineus': 1,
@@ -37,8 +26,8 @@ const brandCodes = {
 d3.csv('data/RealData.csv', function(d){
     return {
         Perc_Tourist: +d.Perc_TuristicHouseholds_INE,
-        mapX: +d.x, // this can't be called x or the force layout grid won't work!
-        mapY: +d.y, // this can't be called y or the force layout grid won't work!
+        mapX: +d.x, // this can't be called 'x' or the force layout grid won't work!
+        mapY: +d.y, // this can't be called 'y' or the force layout grid won't work!
         INECode: d.INECode,
         IdescatCode: d.IdescatCode,
         municipality: d.Municipality,
@@ -52,17 +41,15 @@ d3.csv('data/RealData.csv', function(d){
     };
 }).then(data => {
     finalData = data
-    // console.log(finalData)
     createScales()
-    // setupGrid()
     setTimeout(drawInitial(), 100)
 })
 
-// ************************** END LOADING DATA **************************//
+// ************************** END LOADING DATA ************************** //
 
 
 
-// ************************** DECLARATION VARS LEGENDS AND SCALES **************************//
+// ************************** LEGENDS AND SCALES ************************** //
 
 
 function createScales(){
@@ -91,11 +78,11 @@ function createScales(){
         .domain(d3.extent(finalData, d => d.perc_Airbnb)).nice()
         .range([height - margin.bottom, margin.top])
     
-    airbnbScale_r = d3.scaleSqrt()
-        .domain([0, d3.max(finalData, d => d.perc_Airbnb)])
-        .range([1, 20])
+    // airbnbScale_r = d3.scaleSqrt()
+    //     .domain([0, d3.max(finalData, d => d.perc_Airbnb)])
+    //     .range([1, 20])
 
-    // COLOR STUFF
+    // COLORS
     blue = '#7bd2ed'
     yellow = '#ffd208'
     teal = '#29DDC7'
@@ -106,17 +93,17 @@ function createScales(){
     // fillScale = d3.scaleSequential(d3.interpolatePuBu)
     //fillScale = d3.scaleSequential(d3.interpolateGnBu)
     //fillScale = d3.scaleLinear().domain([1,10]).range(["#ffffff", "#3da2a4"])
-    fillScale = d3.scaleSequential(chroma.scale(['#fff', teal, newblue]))
+    // fillScale = d3.scaleSequential(chroma.scale(['#fff', teal, newblue]))
 
     
 }
 
   
-// **************************  END DECLARATION VARS LEGENDS AND SCALES **************************//
+// **************************  END LEGENDS AND SCALES **************************//
 
 // **************************  SET UP OTHER VARIABLES **************************//
 
-    // FOR 'BAR CHART'
+// FOR 'BAR CHART'
 function setupGrid(grid_cols, bar_group, bar_label) {    
         const GRID_SIZE = 15; // controls how much space there is between each square
         let GRID_COLS = grid_cols;
@@ -151,12 +138,7 @@ function setupGrid(grid_cols, bar_group, bar_label) {
             bar_rows: sorted.map(d => d.bar_rows)
         }
 
-        // console.log(data_structure)
-
-        // grid.init();
-
         bar_start_points = []
-        // start_x = 0
 
         const GRID_ROWS = Math.ceil(finalData.length / GRID_COLS);    
             
@@ -167,29 +149,28 @@ function setupGrid(grid_cols, bar_group, bar_label) {
             this.cells = {};
             
             for (var bar = 0; bar < data_structure.bars.length; bar++) {
-                let curr_g = 
+                // let curr_g = 
                 this.cells[bar] = [];
-                let bar_cells = [];
+                // let bar_cells = [];
                 let cells_count = data_structure.bar_counts[bar];
                   
                 start_x = bar * (GRID_COLS+1) * GRID_SIZE;
                 bar_start_points.push(start_x)
                     
                 for(var r = 0; r < GRID_ROWS; r++) {
-                for(var c = 0; c < GRID_COLS; c++) {
-                    if (cells_count <= 0) continue;
+                    for(var c = 0; c < GRID_COLS; c++) {
+                        if (cells_count <= 0) continue;
 
-                    var cell;
-                    cell = {
-                    x : start_x + c * GRID_SIZE,
-                    y : height - r * GRID_SIZE,
-                    occupied : false
+                        var cell;
+                        cell = {
+                        x : start_x + c * GRID_SIZE,
+                        y : height - r * GRID_SIZE,
+                        occupied : false
+                        };
+                        
+                        this.cells[bar].push(cell);
+                        cells_count--;
                     };
-                    
-                    this.cells[bar].push(cell);
-                    // bar_cells.push(cell);
-                    cells_count--;
-                };
                 };
             }
             
@@ -200,7 +181,6 @@ function setupGrid(grid_cols, bar_group, bar_label) {
             },
 
             occupyNearest : function(p) {
-            // if (p.group != 0) return null; 
             let bar_i = data_structure.bars.indexOf(p[bar_group]);
             var minDist = 1000000;
             var d;
@@ -218,14 +198,8 @@ function setupGrid(grid_cols, bar_group, bar_label) {
             }
         }
 
-        console.log(bar_start_points)
 }
-
-function make_y_gridlines(scale, ticks) {		
-    return d3.axisLeft(scale)
-        .ticks(ticks)
-}
-      
+ 
 
 // **************************  END SET UP OTHER VARIABLES **************************//
 
@@ -233,34 +207,20 @@ function make_y_gridlines(scale, ticks) {
 
 // ************************** DRAW INITIAL FUNCTION **************************//
 
-// All the initial elements should be create in the drawInitial function
-// As they are required, their attributes can be modified
-// They can be shown or hidden using their 'opacity' attribute
-// Each element should also have an associated class name for easy reference
-
 function drawInitial(){
-
-    // avoid hand cursor appears
-    //document.getElementById("map").style.display = "none";
 
     let svg = d3.select("#vis")
                 .append('svg')
-                // .attr('width', width)
-                // .attr('height', height)
                 .attr('viewBox', `0 0 ${width} ${height}`)
                 .attr('opacity', 1)
 
 
 
     // SIMULATION FORCES
-    // *******************
-    // Instantiates the force simulation
-    // Has no forces. Actual forces are added and removed as required
+    // creates simulation sans forces — those are added and removed by later functions
     simulation = d3.forceSimulation(finalData)
 
     simulation.on('tick', () => {
-
-        // setupGrid(grid_cols = grid_cols_input, bar_group = bar_group_input, bar_label = bar_label_input)
 
         grid.init();
             
@@ -268,11 +228,11 @@ function drawInitial(){
             .each(function(d) { 
                 let gridpoint = grid.occupyNearest(d);
                 if (gridpoint) {            
-                    // ensures smooth movement towards final positoin
+                    // smooth motions
                                 d.x += (gridpoint.x - d.x) * 0.08;
                                 d.y += (gridpoint.y - d.y) * 0.08;
                 
-                    // jumps directly into final position  
+                    // to jump directly to final position  
                     // d.x = gridpoint.x;
                     // d.y = gridpoint.y
                             }
@@ -283,10 +243,7 @@ function drawInitial(){
 
     simulation.stop()
 
-    // DRAW 0 - CATALONIA MAP - ADDING TO SVG
-    // **************************************
-    // square = d3.symbol().type(d3.symbolSquare).size(width/2);
-    
+    // CATALONIA MAP    
     nodes = svg
         .selectAll('circle')
         .data(finalData)
@@ -297,45 +254,6 @@ function drawInitial(){
             .attr('r', 4)
             .attr('cx', d => map_0_xScale(d.mapX))
             .attr('cy', d => map_0_yScale(d.mapY))
-
-    
-    // MOUSE EVENTS - ALL CIRCLES/SQUARES
-    // **********************************
-    // Add mouseover and mouseout events for all circles
-    // Changes opacity and adds border
-    // svg.selectAll('circle')
-    //     .on('mouseover', mouseOver)
-    //     .on('mouseout', mouseOut)
-
-    // function mouseOver(d, i){
-
-    //     /*console.log('hi')
-    //     d3.select(this)
-    //         .transition('mouseover').duration(100)
-    //         .attr('opacity', 1)
-    //         .attr('stroke-width', 5)
-    //         .attr('stroke', 'black')
-            
-    //     d3.select('#tooltip')
-    //         .style('left', (d3.event.pageX + 10)+ 'px')
-    //         .style('top', (d3.event.pageY - 25) + 'px')
-    //         .style('display', 'inline-block')
-    //         .html(`<strong>Major:</strong> ${d.Major[0] + d.Major.slice(1,).toLowerCase()} 
-    //             <br> <strong>Median Salary:</strong> $${d3.format(",.2r")(d.Median)} 
-    //             <br> <strong>Category:</strong> ${d.Category}
-    //             <br> <strong>% Female:</strong> ${Math.round(d.ShareWomen*100)}%
-    //             <br> <strong># Enrolled:</strong> ${d3.format(",.2r")(d.Total)}`)*/
-    // }
-    
-    // function mouseOut(d, i){
-    //     d3.select('#tooltip')
-    //         .style('display', 'none')
-
-    //     d3.select(this)
-    //         .transition('mouseout').duration(100)
-    //         .attr('opacity', 0.8)
-    //         .attr('stroke-width', 0)
-    // }
 
 
     // CREATE ALL AXES — SET OPACITY TO 0
@@ -360,26 +278,11 @@ function drawInitial(){
             .attr("x", 5)
             .attr("text-anchor", "start")
             .attr('font-weight', 'bold')
-            .attr('font-size', '0.8rem')
-            .attr('font-color', '#333333')
-            .attr('font-family', 'Roboto Condensed')
             .text('Number of AirBnBs'))
-
-        // .attr('transform', `translate(${margin.left + width}, 0)`)
-        // .call(g => g.select('.domain')
-        //     .remove())
-        // .call(g => g.selectAll('.tick line'))
-        //     .attr('stroke-opacity', 0.2)
-        //     .attr('stroke-color', '#d6d6d6')
-        //     .attr("text-anchor", "end")
-        //     .attr('font-size', '0.8rem')
-        //     .attr('font-color', '#333333')
-        //     .attr('font-family', 'Roboto Condensed')
-
         
     
     // NUMBER OF AIRBNBS WITHOUT BARCELONA
-    let airbnbAxis_noBCN = d3.axisLeft(airbnbScale_noBCN)//.ticks(8).tickPadding(40)
+    let airbnbAxis_noBCN = d3.axisLeft(airbnbScale_noBCN)
     
     svg.append('g')
         .call(airbnbAxis_noBCN)
@@ -402,7 +305,7 @@ function drawInitial(){
 
 
     // PERCENT AIRBNBS
-    let airbnbPerAxis = d3.axisLeft(airbnbPerScale)//.ticks(8).tickPadding(40).tickSize([width])
+    let airbnbPerAxis = d3.axisLeft(airbnbPerScale)
     
     svg.append('g')
         .call(airbnbPerAxis)
@@ -425,7 +328,7 @@ function drawInitial(){
 
         
     // POPULATION
-    let popAxis = d3.axisBottom(popScale)//.tickSize([0]).ticks(6).tickPadding(10)
+    let popAxis = d3.axisBottom(popScale)
     
     svg.append('g')
         .call(popAxis)
@@ -453,7 +356,7 @@ function drawInitial(){
             .text('Population'))
     
     // POPULATION WITHOUT BARCELONA
-    let popAxis_noBCN = d3.axisBottom(popScale_noBCN)//.tickSize([0]).ticks(6)
+    let popAxis_noBCN = d3.axisBottom(popScale_noBCN)
 
     svg.append('g')
         .call(popAxis_noBCN)
@@ -500,7 +403,7 @@ function drawInitial(){
         {'name': "Barcelona", 'start': 840}
     ]
 
-    const brand_label_data2 = [
+    const brand_label_data2 = [ // cheating on text wrapping — fix this later!
         {'name': 'Barcelona', 'start': 105},
         {'name': 'Lleida', 'start': 315},
         {'name': 'Barcelona', 'start': 525},
@@ -806,18 +709,11 @@ function drawInitial(){
 
 // ************************** CLEAN FUNCTION **************************//
 
-// Will hide all the elements which are not necessary for a given chart type 
+// will hide all the elements that aren't needed 
 
 function clean(chartType){
     let svg = d3.select('#vis').select('svg')
-    if (chartType == 'isdrawCover') { 
-        svg.selectAll('.annotation_map').transition().attr('opacity', 0)
-        svg.selectAll('circle').transition().attr('opacity',0)
-    }
-    if (chartType == 'isdrawIntro') { 
-        svg.selectAll('.annotation_map').transition().attr('opacity', 0)
-        svg.selectAll('circle').transition().attr('opacity',0)
-    }
+
     if (chartType !== 'isDraw0') { 
         svg.selectAll('.annotation_map').transition().attr('opacity', 0)
     }
@@ -851,22 +747,7 @@ function clean(chartType){
         svg.select('.popAxis_noBCN').transition().attr('opacity', 0)
     }
     if (chartType !== 'isDraw6') {
-        // svg.select('.sizeLegend').attr('opacity', 0)
     }
-    // if (chartType !== 'isDraw7') {
-    //     // no axes needed for the graph, but will need a legend of some kind
-    // }
-    /*if (chartType == "isMapBox" || chartType == "ex1"){
-        document.getElementById("map").style.display = "block";
-    }else{
-        document.getElementById("map").style.display = "none";
-    }*/
-
-    /*if (chartType == 'isEx1') {
-        console.log("ex1-opacity")
-        document.getElementById("stepMapBox").style.opacity = 1;
-        document.getElementById("stepEx1").style.opacity = 0;
-    }*/
 
 }
 
@@ -875,27 +756,21 @@ function clean(chartType){
 
 // ************************** ALL DRAW FUNCTIONS **************************//
 
-//First draw function
+// first two draw functions are empty — just needed to make html steps align properly
 
 function drawCover(){
-    console.log("draw Cover")
-    clean('isdrawCover')
+
 }
 
 function drawIntro(){
-    // svg.selectAll('circle')
-    //     .attr('opacity', 0)
-        
-    console.log("drawIntro");
-    clean('isdrawIntro')
+
 }
 
 function draw0(){
     clean('isDraw0')
     simulation.stop()
-
-    console.log('hi 0')
     
+    // scatterplot map of catalonia
     let svg = d3.select("#vis")
                     .select('svg')
                     .attr('width', 1000)
@@ -913,13 +788,13 @@ function draw0(){
         .attr('cx', d => map_0_xScale(d.mapX))
         .attr('cy', d => map_0_yScale(d.mapY))
 
-    console.log("draw 0")
 }
 
 function draw05(){
     let svg = d3.select("#vis").select('svg')
     clean('isDraw05')
 
+    // force grid 'bar' chart — with or without airbnbs
     setupGrid(grid_cols = 20, bar_group = 'chunk', bar_label = 'chunk')
 
     simulation
@@ -934,13 +809,13 @@ function draw05(){
         .attr('stroke', d => d.airbnb > 0 ? 'none' : teal)
     
     svg.selectAll('.chunkLabels').transition().attr('opacity', 1)
-    console.log("draw 05")
 }
 
 function draw1(){
     let svg = d3.select("#vis").select('svg')
     clean('isDraw1')
 
+    // revised force bar — tourist brands
     setupGrid(grid_cols = 6, bar_group = 'brandCode', bar_label = 'brand')
 
     simulation
@@ -965,7 +840,6 @@ function draw1(){
         .transition()
         .attr('opacity', 1)
     
-   console.log("draw 1")
 }
 
 function draw2(){
@@ -974,7 +848,7 @@ function draw2(){
     let svg = d3.select("#vis").select('svg')
     clean('isDraw2')
 
-    // need popAxis and airbnbAxis
+    // population versus airbnbs — all of catalonia
     svg.selectAll('.popAxis').transition().attr('opacity', 0.7).selectAll('.domain').attr('opacity', 1)
     svg.selectAll('.airbnbAxis').transition().attr('opacity', 0.7).selectAll('.domain').attr('opacity', 1)
     svg.selectAll('.annotation_bcn').transition().attr('opacity', 1).delay(800)
@@ -987,14 +861,13 @@ function draw2(){
         .attr('fill', teal)
         .attr('opacity', 0.7)
         
-    console.log("draw 2")
 }
 
 function draw3(){
     let svg = d3.select("#vis").select('svg')
     clean('isDraw3')
 
-    // need popScale_noBCN and airbnbScale_noBCN
+    // population vs airbnbs — without barcelona
     svg.selectAll('.popAxis_noBCN').transition().attr('opacity', 0.7).selectAll('.domain').attr('opacity', 1)
     svg.selectAll('.airbnbAxis_noBCN').transition().attr('opacity', 0.7).selectAll('.domain').attr('opacity', 1)
     svg.selectAll('.annotation_airbnbs').transition().attr('opacity', 1).delay(800)
@@ -1006,7 +879,6 @@ function draw3(){
         // .attr('r', 4)
         .attr('fill', d => d.municipality == 'Barcelona' ? 'none' : teal)
         .attr('opacity', 0.7)
-        console.log("draw 3")
 }
 
 function draw4(){
@@ -1014,7 +886,7 @@ function draw4(){
     let svg = d3.select('#vis').select('svg')
     clean('isDraw4')
 
-    // need popScale_noBCN, airbnbPerScale
+    // population vs percent airbnbs — without barcelona
     svg.selectAll('.popAxis_noBCN').transition().attr('opacity', 0.7).selectAll('.domain').attr('opacity', 1)
     svg.selectAll('.airbnbPerAxis').transition().attr('opacity', 0.7).selectAll('.domain').attr('opacity', 1)
     svg.selectAll('.annotation_perc').transition().attr('opacity', 1).delay(800)
@@ -1024,17 +896,16 @@ function draw4(){
         .attr('cx', d => popScale_noBCN(d.population))
         .attr('cy', d => airbnbPerScale(d.perc_Airbnb))
         // .attr('r', 4)
-        .attr('fill', d => d.perc_Airbnb ? teal : 'none')//{if (d.municipality == 'Barcelona' || isNaN(d.perc_Airbnb)){ return 'none'} else { return teal }})
+        .attr('fill', d => d.perc_Airbnb ? teal : 'none')
         .attr('stroke', 'none')
         .attr('opacity', 0.7)
-    console.log("draw 4")
 }
 
 function draw5(){    
     let svg = d3.select("#vis").select("svg")
     clean('isDraw5')
 
-    // need popAxis_noBCN, airbnbPerAxis
+    // population vs percent airbnbs — without barcelona, highlight costa brava
     svg.selectAll('.popAxis_noBCN').transition().attr('opacity', 0.7).selectAll('.domain').attr('opacity', 1)
     svg.selectAll('.airbnbPerAxis').transition().attr('opacity', 0.7).selectAll('.domain').attr('opacity', 1)
 
@@ -1050,94 +921,26 @@ function draw5(){
             else { return 'none' }})
         .attr('stroke', 'none')
         .attr('opacity', 0.7)
-        console.log("draw 5")
 }
 
 function draw6(){
     let svg = d3.select('#vis').select('svg')
     clean('isDraw6')
 
+    // delete circles
     svg.selectAll('circle')
         .transition().duration(800)
         .attr('fill', 'none')
         .attr('stroke', 'none')
-
-    // FINAL MAP THAT WE'RE DELETING
-    // svg.selectAll('circle')
-    //     .transition().duration(800).ease(d3.easeBack)
-    //     .attr('fill', teal)
-    //     .attr('r', d => d.perc_Airbnb ? airbnbScale_r(d.perc_Airbnb) : 0)
-    //     .attr('cx', d => map_0_xScale(d.mapX))
-    //     .attr('cy', d => map_0_yScale(d.mapY))
-    //     .style('mix-blend-mode', 'multiply')
-
-    console.log("draw6");
 }
 
-function draw7(){
-    clean('isDraw7')
-    console.log("draw7");
-}
-
-
-function draw8(){
-     clean('isDraw8')
-     console.log("draw8");
-}
-
-// function drawMapBox(){
-//      clean('isMapBox')
-//      console.log("draw9");
-// }
-
-// function ex1(){
-//     console.log("ex1");
-//     clean('isEx1')
-// }
-// function ex2(){
-//     console.log("ex2");
-// }
-// function ex3(){
-//     console.log("ex3");
-// }
-// function ex4(){
-//     console.log("ex4");
-// }
-// function ex5(){
-//     console.log("ex5");
-// }
-// function ex6(){
-//     console.log("ex6");
-// }
-// function ex7(){
-//     console.log("ex7");
-// }
-// function ex8(){
-//     console.log("ex8");
-// }
-// function ex9(){
-//     console.log("ex9");
-// }
-function drawConclusions(){
-    console.log("drawConclusions");
-}
-// function drawMeto(){
-//     console.log("drawMeto");
-// }
-function drawFooter(){
-    console.log("drawFooter");
-}
 
 // ************************** END ALL DRAW FUNCTIONS **************************//
 
 
 
-// ************************** LOGIC OF THE SCROLLYTELLING **************************//
+// ************************** SCROLLYTELLING LOGIC **************************//
 
-//Array of all the graph functions
-//Will be called from the scroller functionality
-
-// ex == extra steps to mapbox "substeps"
 let activationFunctions = [
     drawCover,
     drawIntro,
@@ -1148,48 +951,18 @@ let activationFunctions = [
     draw3,
     draw4,
     draw5,
-    draw6,
-    draw7,
-    // draw8,
-    // drawMapBox,
-    // ex1,
-    // ex2,
-    // ex3,
-    // ex4,
-    // ex5,
-    // ex6,
-    // ex7,
-    // ex8,
-    // ex9,
-    drawConclusions,
-    // drawMeto,
-    drawFooter
+    draw6
 ]
-
-//All the scrolling function
-//Will draw a new graph based on the index provided by the scroll
 
 
 let scroll = scroller()
     .container(d3.select('#graphic'))
+
 scroll()
 
 let lastIndex, activeIndex = 0
 
 scroll.on('active', function(index){
-
-    // 12 = ex1, 13 = ex2, 14 = ex3, 15= ex4 ...
-    if(index != 13 && index != 14 && index != 15 && index != 16 && index != 17 && index != 18 && index != 19  && index != 20 && index != 21){
-        d3.selectAll('.step')
-            .transition().duration(500)
-            .style('opacity', function (d, i) {return i === index ? 1 : 0;});
-    }
-
-    if(index == 21){
-            d3.selectAll('.step')
-            .transition().duration(500)
-            .style('opacity', 1);
-    }
 
     activeIndex = index
     let sign = (activeIndex - lastIndex) < 0 ? -1 : 1; 
@@ -1199,7 +972,6 @@ scroll.on('active', function(index){
     })
     lastIndex = activeIndex;
 
-
 })
 
 scroll.on('progress', function(index, progress){
@@ -1208,4 +980,4 @@ scroll.on('progress', function(index, progress){
     }
 })
 
-// ************************** END LOGIC OF THE SCROLLYTELLING **************************//
+// ************************** END SCROLLYTELLING LOGIC ************************* //
